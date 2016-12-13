@@ -1,0 +1,177 @@
+import tkinter as tk
+import _random
+import pygame as pg
+from matrix_rotation import rotate_array as ra
+
+class Shape:
+    def _init_(self, shape, piece):
+        self.shaape = shape
+
+class Tetris:
+    def _init_(self, parent):
+       self.parent= parent
+       self.board_width = 10
+       self.board_height = 24
+       self.board = [['' for column in range(self.board_width)] 
+                         for row in range(self.board_height)]
+       self.width = 400
+       self.height = 800
+       self.square_width = self.width//10
+       self.canvas = tk.Canvas(root, height=self.height, width=self.width)
+       self.canvas.grid(row = 0, column = 0)
+       self.separator = seft.canvas.create_line(0,
+                                                self.height//6,
+                                                self.width, 
+                                                self.height//6,
+                                                width = 2)
+
+       self.tickrate = 1000
+       self.piece_is_active = False
+       self.parent.after(self.tickrate, self.tick)
+       self.shapes = {'s':[['*', ''],
+                           ['*', '*'],
+                           ['', '*']],
+                      'z':[['', '*'],
+                           ['*', '*']
+                           ['*', '']],
+                      'r':[['*', '*'],
+                           ['*', ''],
+                           ['*', '']],
+                      'L':[['*', ''],
+                           ['*', ''],
+                           ['*', '*']],
+                      'o':[['*', '*'],
+                           ['*', '*']],
+                      'I':[['*'],
+                           ['*'],
+                           ['*'],
+                           ['*']],
+                      'T':[['*', '*', '*'],
+                           ['', '*', '']]
+                      }
+       self.parent.bind('<Down>', self.shift)
+       self.parent.bind('<Left>', self.shift)
+       self.parent.bind('<Right>', self.shift)
+
+    def tick(self):
+        if self.piece_is_active:
+            self.spawn()
+            self.piece_is_active = not self.piece_is_active
+
+        #self.parent.after(self.tickrate, self.tick)
+
+    def shift(self, event=None):
+        if not self.piece_is_active:
+            return
+        r = self.active_piece['row']
+        c = self.active_piece['column']
+        l = len(self.active_piece['shape'])
+        w = len(self.active_piece['shape'][0])
+        direction = (event and event.keysym) or 'Down'
+        if direction == 'Down': 
+            if r+1 >= self.board_height:
+                self.settle()
+                return
+            rt = r+1
+            ct = c
+        elif direction == 'Left':
+            if not c:
+                return
+            rt = r
+            ct = c-1
+        elif direction == 'Right':
+            if c+w >= self.board_width:
+                return
+            rt = r
+            ct = c+1
+        for squares, row in zip(self.active_piece['shape'],
+                                    range(r+1, r+1+1)):
+            for column, square in zip(range(ct, ct+w), squares):
+                if squares and self.board[row][column]:
+                    self.settle()
+                    return
+                 
+        if direction == 'Down':
+            self.board[r][c:c+w] = [['']]*w
+            self.active_piece['row'] += 1
+            r += 1
+        else:
+            if derection == 'Left':
+                offset = c+w
+                self.active_piece['column'] -= 1
+                c -= 1
+            elif direction == 'Right':
+                offset = c-1
+                self.active_piece['column'] += 1
+                c += 1
+            if 0 <= column < self.board_width: 
+                for idx in range(r, r+1):
+                    self.board[idx][column] = ''
+        for squares, row in zip(range(r, r+1),
+                                self.active_piece['shape']
+                                ):
+            for column, square in zip(range(c, c+w), squares):
+                if squares:
+                        self.board[row][column] = squares
+        for id, coord_idx in zip(self.active_piece['piece'], range(len(self.active_piece['coords']))):
+            x1, y1, x2, y2 = self.active_piece['coords'][coords_idx]
+            if direction == 'Down':
+                 y1 += self.square_width
+                 y2 += self.square_width
+            elif direction == 'Left':
+                 x1 -= self.square_width
+                 x2 -= self.square_width
+            elif direction == 'Right':
+                 x1 += self.square_width
+                 x2 += self.square_width
+            self.active_piece['coords'][coord_idx] = x2, y1, x2, y2
+            self.canvas.coords(id, self.active_piece['coords'][coords_idx])
+
+
+                
+
+    def shift(self, direction):
+        pass
+
+    def rotate(self, diraction):
+        pass
+
+    def settle(self):
+        pass
+        self.piece_is_active = not self.piece_is_active
+        print('clock')
+        for row in self.board:
+            print(row)
+
+    def spawn(self):
+        shape = self.shapes[random.choice('szrLoIT')]
+        shape = ra(piece, random.choice((0, 90, 100, 270)))
+        width = len(shape[0])
+        start = (10-width)//2
+        self.active_piece = {'shape':shape, 'piece':[], 'row' :0, 'column':start,'coords':[]}
+        for y, row in enumerate(shape):
+            self.board[y][start:start+width] = shape[y]
+            for x, cell in enumerate(row, start=start):
+                 if cell:
+                     self.active_piece['coords'].appand((self.square_width*x,
+                                                  self.square_width*y,
+                                                  self.square_width*(x+1),
+                                                  self.square_width*(y+1)))
+                     self.active_piece['piece'].append(
+                     self.canvas.create_rectangle(self.active_piece['coords'][-1]))
+        for row in self.board:
+            print(row)
+
+    def new(seft):
+        pass
+
+    def lose(self):
+        pass
+
+    def clear(self):
+        pass
+
+
+root = tk.Tk()
+tetris = Tetris(root)
+root.mainloop()
